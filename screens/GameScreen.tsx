@@ -15,17 +15,17 @@ import {getBrickCorners} from "@/logic/brickCorners";
 const GameScreen = () => {
     const [panResponder, setPanResponder] = React.useState<React.JSX.Element | null>(null);
     const [brickCollisionsState, setBrickCollisionsState] = React.useState<Array<BrickCollision>>([]);
-    // const [brickCollision, setBrickCollision] = React.useState<BrickCollision | null>(null);
 
-    /**
-     * <Brick bubble={bubble} index={2} offset={offset} />
-     *             <Brick bubble={bubble} index={20} offset={offset} />
-     *             <Brick bubble={bubble} index={40} offset={offset} />
-     */
     const bricksProps: Array<BrickProps> = [
         {bubble, index: 2, offset},
         {bubble, index: 20, offset},
         {bubble, index: 40, offset},
+        {bubble, index: 60, offset},
+        {bubble, index: 80, offset},
+        {bubble, index: 100, offset},
+        {bubble, index: 150, offset},
+        {bubble, index: 200, offset},
+        {bubble, index: 250, offset},
     ];
     const bricksCollisions = useRef<Array<BrickCollision>>(bricksProps.map((brick) => getBrickCorners(brick)));
 
@@ -35,11 +35,6 @@ const GameScreen = () => {
 
     return <>
         <Svg width={windowWidth} height={windowHeight}>
-            <Ball
-                limitBubble={bubble}
-                offset={offset}
-                obstacles={bricksCollisions.current}
-            />
             <Bubble
                 {...bubble}
                 offset={offset}
@@ -52,20 +47,18 @@ const GameScreen = () => {
                     rotation={0}
                     getPanResponder={(elm) => setPanResponder(elm)}
                     getBrickCollision={(brick) => {
-                        if (!bricksCollisions.current) {
-                            return;
-                        }
-
-                        if (!bricksCollisions.current.some((brickCollision) => brickCollision.brickIndex === brick.brickIndex)) {
-                            return;
-                        }
-
-                        // push this brickCollision to the state
-                        bricksCollisions.current = [
+                        const new_ = [
                             ...bricksCollisions.current.filter((brickCollision) => brickCollision.brickIndex !== brick.brickIndex),
                             brick
                         ];
+                        bricksCollisions.current = new_;
+                        setBrickCollisionsState(new_);
                     }}
+            />
+            <Ball
+                limitBubble={bubble}
+                offset={offset}
+                obstacles={brickCollisionsState}
             />
         </Svg>
         {panResponder}
